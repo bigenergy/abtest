@@ -1,0 +1,53 @@
+@use "../abstracts" as *;
+
+.container {
+  width: 100%;
+  max-width: $container-width + $container-padding * 2;
+  padding: 0 $container-padding;
+  margin: 0 auto;
+}
+
+.header {
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    min-height: 64px;
+  }
+}
+
+.logo {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: $color-text;
+
+  &:hover {
+    color: $color-text;
+  }
+
+  &__icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.main {
+  flex: 1;
+  padding: 32px 0 56px;
+
+  @include media-up(md) {
+    padding-top: 48px;
+  }
+}
+
+.footer {
+  padding: 24px 0;
+  font-size: 14px;
+  color: $color-muted;
+  border-top: 1px solid $color-border;
+}
