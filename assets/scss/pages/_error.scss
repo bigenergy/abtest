@@ -1,0 +1,23 @@
+@use "../abstracts" as *;
+
+.error-page {
+  padding: 64px 0;
+  text-align: center;
+
+  &__code {
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1;
+    color: $color-accent;
+  }
+
+  &__title {
+    margin-top: 16px;
+    font-size: 28px;
+  }
+
+  &__text {
+    margin: 8px 0 28px;
+    color: $color-muted;
+  }
+}

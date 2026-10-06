@@ -1,0 +1,25 @@
+@use "../abstracts" as *;
+
+// Publication date and views counter
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  align-items: center;
+  font-size: 14px;
+  color: $color-muted;
+}
+
+.views {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+
+  &::before {
+    width: 16px;
+    height: 16px;
+    content: "";
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}

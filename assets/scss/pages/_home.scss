@@ -1,0 +1,53 @@
+@use "../abstracts" as *;
+
+.hero {
+  margin-bottom: 40px;
+
+  &__title {
+    font-size: 28px;
+
+    @include media-up(md) {
+      font-size: 36px;
+    }
+  }
+
+  &__text {
+    margin-top: 8px;
+    font-size: 18px;
+    color: $color-muted;
+  }
+}
+
+// A category with its latest articles
+.section {
+  & + & {
+    margin-top: 56px;
+  }
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 24px;
+
+    a {
+      color: $color-text;
+
+      &:hover {
+        color: $color-accent;
+      }
+    }
+  }
+
+  &__description {
+    max-width: 640px;
+    margin-top: 4px;
+    color: $color-muted;
+  }
+}

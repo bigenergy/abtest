@@ -1,0 +1,23 @@
+@use "../abstracts" as *;
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: $color-muted;
+
+  > * + *::before {
+    padding: 0 8px;
+    color: $color-border;
+    content: "/";
+  }
+
+  a {
+    color: $color-muted;
+
+    &:hover {
+      color: $color-accent;
+    }
+  }
+}

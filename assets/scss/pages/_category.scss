@@ -1,0 +1,33 @@
+@use "../abstracts" as *;
+
+.page-header {
+  margin-bottom: 28px;
+
+  &__title {
+    font-size: 28px;
+
+    @include media-up(md) {
+      font-size: 36px;
+    }
+  }
+
+  &__text {
+    max-width: 720px;
+    margin-top: 8px;
+    font-size: 18px;
+    color: $color-muted;
+  }
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+
+  &__count {
+    color: $color-muted;
+  }
+}

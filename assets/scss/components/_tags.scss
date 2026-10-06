@@ -1,0 +1,23 @@
+@use "../abstracts" as *;
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $color-accent;
+  background: $color-accent-soft;
+  border-radius: $radius-pill;
+  transition: color $transition, background-color $transition;
+
+  &:hover {
+    color: #fff;
+    background: $color-accent;
+  }
+}

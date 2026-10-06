@@ -1,0 +1,22 @@
+@use "../abstracts" as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: $color-accent;
+  white-space: nowrap;
+  background: $color-surface;
+  border: 1px solid $color-accent;
+  border-radius: $radius-pill;
+  transition: color $transition, background-color $transition;
+
+  &:hover {
+    color: #fff;
+    background: $color-accent;
+  }
+}

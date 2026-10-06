@@ -1,3 +1,16 @@
 @use "base/reset";
 @use "base/base";
 @use "layout/layout";
+
+@use "components/button";
+@use "components/card";
+@use "components/meta";
+@use "components/tags";
+@use "components/breadcrumbs";
+@use "components/sort";
+@use "components/pagination";
+
+@use "pages/home";
+@use "pages/category";
+@use "pages/article";
+@use "pages/error";
