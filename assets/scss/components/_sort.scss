@@ -31,15 +31,5 @@
       background: $color-accent;
       border-color: $color-accent;
     }
-
-    // Arrow shows the direction of the current sorting
-    &--active::after {
-      margin-left: 6px;
-      content: "↓";
-    }
-
-    &--asc::after {
-      content: "↑";
-    }
   }
 }
