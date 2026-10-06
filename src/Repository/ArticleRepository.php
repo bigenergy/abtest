@@ -113,10 +113,27 @@ final class ArticleRepository
 
     /**
      * Articles that share the most categories with the given one; fresher ones go first among equals.
+     * If there are not enough of them, the list is filled up with the newest articles.
      *
      * @return list<array<string, mixed>>
      */
     public function findSimilar(int $articleId, int $limit): array
+    {
+        $similar = $this->findBySharedCategories($articleId, $limit);
+
+        $missing = $limit - count($similar);
+        if ($missing > 0) {
+            $excludeIds = [$articleId, ...array_column($similar, 'id')];
+            $similar = [...$similar, ...$this->findLatestExcept($excludeIds, $missing)];
+        }
+
+        return $similar;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function findBySharedCategories(int $articleId, int $limit): array
     {
         $statement = $this->pdo->prepare(
             'SELECT a.id, a.title, a.description, a.image, a.views, a.published_at
@@ -132,6 +149,30 @@ final class ArticleRepository
         );
         $statement->bindValue('article_id', $articleId, PDO::PARAM_INT);
         $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    /**
+     * @param list<int> $excludeIds
+     * @return list<array<string, mixed>>
+     */
+    private function findLatestExcept(array $excludeIds, int $limit): array
+    {
+        // One placeholder per excluded id: NOT IN (?, ?, ?)
+        $placeholders = implode(', ', array_fill(0, count($excludeIds), '?'));
+
+        $statement = $this->pdo->prepare(
+            "SELECT id, title, description, image, views, published_at
+             FROM articles
+             WHERE id NOT IN ({$placeholders})
+             ORDER BY published_at DESC, id DESC
+             LIMIT ?"
+        );
+        foreach ([...$excludeIds, $limit] as $index => $value) {
+            $statement->bindValue($index + 1, $value, PDO::PARAM_INT);
+        }
         $statement->execute();
 
         return $statement->fetchAll();
