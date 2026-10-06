@@ -1,12 +1,12 @@
 <article class="card">
-    <a class="card__cover" href="/article/{$article.id}" tabindex="-1" aria-hidden="true">
+    <a class="card__cover" href="/article/{$article.slug}" tabindex="-1" aria-hidden="true">
         {if $article.image}
             <img src="{$article.image}" alt="" loading="lazy">
         {/if}
     </a>
     <div class="card__body">
         <h3 class="card__title">
-            <a href="/article/{$article.id}">{$article.title}</a>
+            <a href="/article/{$article.slug}">{$article.title}</a>
         </h3>
         <p class="card__description">{$article.description}</p>
         <div class="card__meta meta">

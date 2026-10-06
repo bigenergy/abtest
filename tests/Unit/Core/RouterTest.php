@@ -17,7 +17,7 @@ final class RouterTest extends TestCase
     {
         $this->router = new Router();
         $this->router->add('/', static fn (): string => 'home');
-        $this->router->add('/article/{id}', static fn (int $id): string => "article {$id}");
+        $this->router->add('/article/{slug}', static fn (string $slug): string => "article {$slug}");
     }
 
     public function testDispatchesExactPath(): void
@@ -25,9 +25,9 @@ final class RouterTest extends TestCase
         self::assertSame('home', $this->router->dispatch('/'));
     }
 
-    public function testPassesPlaceholderAsInteger(): void
+    public function testPassesSlugToHandler(): void
     {
-        self::assertSame('article 42', $this->router->dispatch('/article/42'));
+        self::assertSame('article indeksy-mysql-8', $this->router->dispatch('/article/indeksy-mysql-8'));
     }
 
     #[DataProvider('unknownPathProvider')]
@@ -44,10 +44,12 @@ final class RouterTest extends TestCase
     public static function unknownPathProvider(): iterable
     {
         yield 'no such route' => ['/about'];
-        yield 'not a number' => ['/article/abc'];
-        yield 'zero' => ['/article/0'];
-        yield 'leading zero' => ['/article/01'];
-        yield 'trailing slash' => ['/article/1/'];
-        yield 'extra segment' => ['/article/1/edit'];
+        yield 'empty slug' => ['/article/'];
+        yield 'uppercase letters' => ['/article/Indeksy'];
+        yield 'cyrillic letters' => ['/article/индексы'];
+        yield 'double dash' => ['/article/a--b'];
+        yield 'dash at the end' => ['/article/a-'];
+        yield 'trailing slash' => ['/article/a/'];
+        yield 'extra segment' => ['/article/a/edit'];
     }
 }

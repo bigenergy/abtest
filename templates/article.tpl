@@ -12,7 +12,7 @@
         <header class="article__header">
             <ul class="tags">
                 {foreach $categories as $category}
-                    <li><a class="tag" href="/category/{$category.id}">{$category.name}</a></li>
+                    <li><a class="tag" href="/category/{$category.slug}">{$category.name}</a></li>
                 {/foreach}
             </ul>
             <h1 class="article__title">{$article.title}</h1>

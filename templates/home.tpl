@@ -11,11 +11,11 @@
             <div class="section__header">
                 <div>
                     <h2 class="section__title">
-                        <a href="/category/{$section.category.id}">{$section.category.name}</a>
+                        <a href="/category/{$section.category.slug}">{$section.category.name}</a>
                     </h2>
                     <p class="section__description">{$section.category.description}</p>
                 </div>
-                <a class="button" href="/category/{$section.category.id}">Все статьи</a>
+                <a class="button" href="/category/{$section.category.slug}">Все статьи</a>
             </div>
 
             <div class="cards">

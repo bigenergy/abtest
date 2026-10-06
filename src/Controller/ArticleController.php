@@ -20,15 +20,15 @@ final class ArticleController
     ) {
     }
 
-    public function show(int $id): string
+    public function show(string $slug): string
     {
-        $article = $this->articles->find($id) ?? throw new NotFoundException();
-        $this->articles->incrementViews($id);
+        $article = $this->articles->findBySlug($slug) ?? throw new NotFoundException();
+        $this->articles->incrementViews($article['id']);
 
         return $this->view->render('article.tpl', [
             'article' => $article,
-            'categories' => $this->categories->findByArticle($id),
-            'similar' => $this->articles->findSimilar($id, self::SIMILAR_ARTICLES),
+            'categories' => $this->categories->findByArticle($article['id']),
+            'similar' => $this->articles->findSimilar($article['id'], self::SIMILAR_ARTICLES),
         ]);
     }
 }

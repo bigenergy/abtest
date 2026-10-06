@@ -26,8 +26,8 @@ try {
 
     $router = new Router();
     $router->add('/', [new HomeController($categories, $articles, $view), 'index']);
-    $router->add('/category/{id}', [new CategoryController($categories, $articles, $view), 'show']);
-    $router->add('/article/{id}', [new ArticleController($categories, $articles, $view), 'show']);
+    $router->add('/category/{slug}', [new CategoryController($categories, $articles, $view), 'show']);
+    $router->add('/article/{slug}', [new ArticleController($categories, $articles, $view), 'show']);
 
     echo $router->dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 } catch (NotFoundException) {

@@ -13,23 +13,23 @@ final class CategoryRepository
     }
 
     /**
-     * @return array{id: int, name: string, description: string}|null
+     * @return array{id: int, slug: string, name: string, description: string}|null
      */
-    public function find(int $id): ?array
+    public function findBySlug(string $slug): ?array
     {
-        $statement = $this->pdo->prepare('SELECT id, name, description FROM categories WHERE id = :id');
-        $statement->execute(['id' => $id]);
+        $statement = $this->pdo->prepare('SELECT id, slug, name, description FROM categories WHERE slug = :slug');
+        $statement->execute(['slug' => $slug]);
 
         return $statement->fetch() ?: null;
     }
 
     /**
-     * @return list<array{id: int, name: string}>
+     * @return list<array{id: int, slug: string, name: string}>
      */
     public function findByArticle(int $articleId): array
     {
         $statement = $this->pdo->prepare(
-            'SELECT c.id, c.name
+            'SELECT c.id, c.slug, c.name
              FROM categories c
              JOIN article_category ac ON ac.category_id = c.id
              WHERE ac.article_id = :article_id
@@ -43,12 +43,12 @@ final class CategoryRepository
     /**
      * Categories that have at least one article.
      *
-     * @return list<array{id: int, name: string, description: string}>
+     * @return list<array{id: int, slug: string, name: string, description: string}>
      */
     public function findNotEmpty(): array
     {
         return $this->pdo->query(
-            'SELECT c.id, c.name, c.description
+            'SELECT c.id, c.slug, c.name, c.description
              FROM categories c
              WHERE EXISTS (SELECT 1 FROM article_category ac WHERE ac.category_id = c.id)
              ORDER BY c.name'

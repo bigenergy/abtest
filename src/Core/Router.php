@@ -10,11 +10,11 @@ final class Router
     private array $routes = [];
 
     /**
-     * Placeholders like {id} match positive integers and are passed to the handler as int.
+     * Placeholders like {slug} match lowercase latin letters and digits separated by single dashes.
      */
     public function add(string $pattern, callable $handler): void
     {
-        $regex = '#^' . preg_replace('/\{\w+\}/', '([1-9]\d*)', $pattern) . '$#';
+        $regex = '#^' . preg_replace('/\{\w+\}/', '([a-z0-9]+(?:-[a-z0-9]+)*)', $pattern) . '$#';
 
         $this->routes[$regex] = $handler;
     }
@@ -26,9 +26,7 @@ final class Router
     {
         foreach ($this->routes as $regex => $handler) {
             if (preg_match($regex, $path, $matches)) {
-                $params = array_map('intval', array_slice($matches, 1));
-
-                return $handler(...$params);
+                return $handler(...array_slice($matches, 1));
             }
         }
 

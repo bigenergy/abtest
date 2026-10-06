@@ -22,21 +22,23 @@ final class CategoryController
     ) {
     }
 
-    public function show(int $id): string
+    public function show(string $slug): string
     {
-        $category = $this->categories->find($id) ?? throw new NotFoundException();
+        $category = $this->categories->findBySlug($slug) ?? throw new NotFoundException();
         $sort = ArticleSort::fromQuery($_GET['sort'] ?? null);
 
         $paginator = Paginator::fromQuery(
-            total: $this->articles->countByCategory($id),
+            total: $this->articles->countByCategory($category['id']),
             perPage: self::ARTICLES_PER_PAGE,
             page: $_GET['page'] ?? null,
             query: ['sort' => $sort->value],
         ) ?? throw new NotFoundException();
 
+        $articles = $this->articles->findByCategory($category['id'], $sort, $paginator->perPage, $paginator->offset());
+
         return $this->view->render('category.tpl', [
             'category' => $category,
-            'articles' => $this->articles->findByCategory($id, $sort, $paginator->perPage, $paginator->offset()),
+            'articles' => $articles,
             'sort' => $sort,
             'sorts' => ArticleSort::cases(),
             'paginator' => $paginator,

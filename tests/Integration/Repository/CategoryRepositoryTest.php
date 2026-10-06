@@ -17,15 +17,15 @@ final class CategoryRepositoryTest extends DatabaseTestCase
         $this->categories = new CategoryRepository($this->pdo);
     }
 
-    public function testFindsCategoryById(): void
+    public function testFindsCategoryBySlug(): void
     {
-        $id = $this->createCategory('PHP');
+        $this->createCategory('Базы данных');
 
-        $category = $this->categories->find($id);
+        $category = $this->categories->findBySlug('bazy-dannyh');
 
         self::assertNotNull($category);
-        self::assertSame('PHP', $category['name']);
-        self::assertNull($this->categories->find($id + 1));
+        self::assertSame('Базы данных', $category['name']);
+        self::assertNull($this->categories->findBySlug('net-takoy'));
     }
 
     public function testSkipsCategoriesWithoutArticles(): void

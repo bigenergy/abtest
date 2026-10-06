@@ -15,12 +15,14 @@ final class ArticleRepository
     /**
      * @return array<string, mixed>|null
      */
-    public function find(int $id): ?array
+    public function findBySlug(string $slug): ?array
     {
         $statement = $this->pdo->prepare(
-            'SELECT id, title, description, content, image, views, published_at FROM articles WHERE id = :id'
+            'SELECT id, slug, title, description, content, image, views, published_at
+             FROM articles
+             WHERE slug = :slug'
         );
-        $statement->execute(['id' => $id]);
+        $statement->execute(['slug' => $slug]);
 
         return $statement->fetch() ?: null;
     }
@@ -41,9 +43,9 @@ final class ArticleRepository
         // ROW_NUMBER() numbers articles inside each category starting from the newest one,
         // so one query returns the top N for all categories at once
         $statement = $this->pdo->prepare(
-            'SELECT category_id, id, title, description, image, views, published_at
+            'SELECT category_id, id, slug, title, description, image, views, published_at
              FROM (
-                 SELECT ac.category_id, a.id, a.title, a.description, a.image, a.views, a.published_at,
+                 SELECT ac.category_id, a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at,
                         ROW_NUMBER() OVER (
                             PARTITION BY ac.category_id
                             ORDER BY a.published_at DESC, a.id DESC
@@ -89,7 +91,7 @@ final class ArticleRepository
         };
 
         $statement = $this->pdo->prepare(
-            "SELECT a.id, a.title, a.description, a.image, a.views, a.published_at
+            "SELECT a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at
              FROM articles a
              JOIN article_category ac ON ac.article_id = a.id
              WHERE ac.category_id = :category_id
@@ -129,7 +131,7 @@ final class ArticleRepository
     private function findBySharedCategories(int $articleId, int $limit): array
     {
         $statement = $this->pdo->prepare(
-            'SELECT a.id, a.title, a.description, a.image, a.views, a.published_at
+            'SELECT a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at
              FROM article_category ac
              JOIN article_category related
                   ON related.category_id = ac.category_id
@@ -157,7 +159,7 @@ final class ArticleRepository
         $placeholders = implode(', ', array_fill(0, count($excludeIds), '?'));
 
         $statement = $this->pdo->prepare(
-            "SELECT id, title, description, image, views, published_at
+            "SELECT id, slug, title, description, image, views, published_at
              FROM articles
              WHERE id NOT IN ({$placeholders})
              ORDER BY published_at DESC, id DESC

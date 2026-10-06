@@ -19,15 +19,15 @@ final class ArticleRepositoryTest extends DatabaseTestCase
         $this->articles = new ArticleRepository($this->pdo);
     }
 
-    public function testFindsArticleById(): void
+    public function testFindsArticleBySlug(): void
     {
-        $id = $this->createArticle('Генераторы PHP', [$this->createCategory('PHP')]);
+        $this->createArticle('Генераторы PHP', [$this->createCategory('PHP')]);
 
-        $article = $this->articles->find($id);
+        $article = $this->articles->findBySlug('generatory-php');
 
         self::assertNotNull($article);
         self::assertSame('Генераторы PHP', $article['title']);
-        self::assertNull($this->articles->find($id + 1));
+        self::assertNull($this->articles->findBySlug('net-takoy'));
     }
 
     public function testIncrementsViews(): void
@@ -37,7 +37,7 @@ final class ArticleRepositoryTest extends DatabaseTestCase
         $this->articles->incrementViews($id);
         $this->articles->incrementViews($id);
 
-        self::assertSame(12, $this->articles->find($id)['views'] ?? null);
+        self::assertSame(12, $this->articles->findBySlug('statya')['views'] ?? null);
     }
 
     public function testTakesThreeNewestArticlesOfEachCategory(): void
