@@ -41,9 +41,9 @@ final class View
     /**
      * "2026-03-08 14:30:00" => "8 марта 2026"
      */
-    private static function formatDate(string $date): string
+    private static function formatDate(string $value): string
     {
-        $date = new DateTimeImmutable($date);
+        $date = new DateTimeImmutable($value);
 
         return sprintf('%d %s %d', $date->format('j'), self::MONTHS[(int) $date->format('n')], $date->format('Y'));
     }
