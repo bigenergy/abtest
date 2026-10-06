@@ -16,11 +16,12 @@ final class View
 
     private readonly Smarty $smarty;
 
-    public function __construct(string $templateDir, string $compileDir)
+    public function __construct(string $templateDir, string $compileDir, string $cacheDir)
     {
         $this->smarty = new Smarty();
         $this->smarty->setTemplateDir($templateDir);
         $this->smarty->setCompileDir($compileDir);
+        $this->smarty->setCacheDir($cacheDir);
         // Every {$variable} is escaped, so data from the database is safe to print as is
         $this->smarty->setEscapeHtml(true);
         $this->smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'date_ru', self::formatDate(...));
@@ -36,6 +37,30 @@ final class View
         $tpl->assign($data);
 
         return $tpl->fetch();
+    }
+
+    /**
+     * Renders a template and keeps the result for $lifetime seconds.
+     * The data callback runs only when there is no fresh copy, so its queries are skipped as well.
+     *
+     * @param callable(): array<string, mixed> $data
+     */
+    public function renderCached(string $template, int $lifetime, callable $data): string
+    {
+        $tpl = $this->smarty->createTemplate($template);
+        $tpl->setCaching(Smarty::CACHING_LIFETIME_CURRENT);
+        $tpl->setCacheLifetime($lifetime);
+
+        if (!$tpl->isCached()) {
+            $tpl->assign($data());
+        }
+
+        return $tpl->fetch();
+    }
+
+    public function clearCache(): void
+    {
+        $this->smarty->clearAllCache();
     }
 
     /**

@@ -14,7 +14,8 @@ final class ViewTest extends TestCase
     protected function setUp(): void
     {
         $root = dirname(__DIR__, 3);
-        $this->view = new View($root . '/templates', $root . '/var/test/templates_c');
+        $this->view = new View($root . '/templates', $root . '/var/test/templates_c', $root . '/var/test/cache');
+        $this->view->clearCache();
     }
 
     public function testFormatsDateInRussian(): void
@@ -51,5 +52,26 @@ final class ViewTest extends TestCase
 
         self::assertStringContainsString('<title>Страница не найдена — DevNotes</title>', $html);
         self::assertStringContainsString('<p class="error-page__code">404</p>', $html);
+    }
+
+    public function testCachedPageSkipsDataUntilCacheIsCleared(): void
+    {
+        $calls = 0;
+        $data = static function () use (&$calls): array {
+            $calls++;
+
+            return ['code' => $calls, 'title' => 'Заголовок', 'text' => 'Текст'];
+        };
+
+        $first = $this->view->renderCached('error.tpl', 60, $data);
+        $second = $this->view->renderCached('error.tpl', 60, $data);
+
+        self::assertSame(1, $calls);
+        self::assertSame($first, $second);
+
+        $this->view->clearCache();
+        $this->view->renderCached('error.tpl', 60, $data);
+
+        self::assertSame(2, $calls);
     }
 }

@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use App\Core\Database;
+use App\Core\View;
 use App\Seeder\Seeder;
 
 $root = dirname(__DIR__);
@@ -29,5 +30,9 @@ if ($articleCount === false) {
 
 $seeder = new Seeder(Database::connect($config['db']), require $root . '/database/seed-data.php');
 $seeder->run($articleCount);
+
+// The cached home page still lists the old articles
+$view = new View($root . '/templates', $root . '/var/templates_c', $root . '/var/cache');
+$view->clearCache();
 
 echo "Готово: создано статей — {$articleCount}\n";

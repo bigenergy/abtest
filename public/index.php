@@ -18,7 +18,7 @@ $root = dirname(__DIR__);
 require $root . '/vendor/autoload.php';
 
 $config = require $root . '/config/config.php';
-$view = new View($root . '/templates', $root . '/var/templates_c');
+$view = new View($root . '/templates', $root . '/var/templates_c', $root . '/var/cache');
 
 try {
     $pdo = Database::connect($config['db']);
