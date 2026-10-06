@@ -7,40 +7,36 @@ namespace App\Service;
 use App\Repository\ArticleRepository;
 
 /**
- * Counts article views so that reloading a page does not inflate the counter.
+ * Counts article views so that reloads and scripts do not inflate the counter.
  */
 final class ViewCounter
 {
-    private const SESSION_KEY = 'viewed_articles';
-
     public function __construct(private readonly ArticleRepository $articles)
     {
     }
 
     /**
-     * A view is counted once per visitor session; robots are not counted at all.
+     * A view is counted once a day per visitor, that is per IP address and browser.
+     * Robots are not counted at all.
      */
     public function count(int $articleId): void
     {
-        if ($this->isRobot($_SERVER['HTTP_USER_AGENT'] ?? '')) {
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        if ($this->isRobot($userAgent)) {
             return;
         }
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start(['cookie_httponly' => true, 'cookie_samesite' => 'Lax']);
-        }
+        // The address itself is not stored, only a hash of it together with the browser
+        $visitor = hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? '') . '|' . $userAgent);
 
-        if (isset($_SESSION[self::SESSION_KEY][$articleId])) {
-            return;
+        if ($this->articles->registerView($articleId, $visitor)) {
+            $this->articles->incrementViews($articleId);
         }
-
-        $_SESSION[self::SESSION_KEY][$articleId] = true;
-        $this->articles->incrementViews($articleId);
     }
 
     private function isRobot(string $userAgent): bool
     {
-        // Robots do not keep cookies, so every request of theirs would look like a new visitor
+        // Crawlers walk through every page again and again, these are not reader views
         return $userAgent === '' || preg_match('/bot|crawl|spider|slurp/i', $userAgent) === 1;
     }
 }

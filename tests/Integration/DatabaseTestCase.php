@@ -29,6 +29,7 @@ abstract class DatabaseTestCase extends TestCase
         $this->db = self::database();
         $this->pdo = $this->db->pdo();
 
+        $this->pdo->exec('DELETE FROM article_views');
         $this->pdo->exec('DELETE FROM article_category');
         $this->pdo->exec('DELETE FROM articles');
         $this->pdo->exec('DELETE FROM categories');
@@ -90,7 +91,7 @@ abstract class DatabaseTestCase extends TestCase
         }
 
         $database = new Database($config);
-        $database->pdo()->exec('DROP TABLE IF EXISTS article_category, articles, categories');
+        $database->pdo()->exec('DROP TABLE IF EXISTS article_views, article_category, articles, categories');
 
         $schema = file_get_contents($root . '/database/schema.sql');
         foreach (array_filter(array_map('trim', explode(';', $schema))) as $statement) {

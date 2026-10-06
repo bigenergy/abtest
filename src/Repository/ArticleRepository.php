@@ -28,6 +28,24 @@ final class ArticleRepository
         return $statement->fetch() ?: null;
     }
 
+    /**
+     * Remembers that the visitor has seen the article today.
+     * Returns false if they already have, so the view must not be counted again.
+     *
+     * @param string $visitor SHA-256 hash in hex
+     */
+    public function registerView(int $articleId, string $visitor): bool
+    {
+        // The primary key allows one row per visitor and day, INSERT IGNORE skips a repeated one
+        $statement = $this->db->prepare(
+            'INSERT IGNORE INTO article_views (article_id, visitor, viewed_on)
+             VALUES (:article_id, UNHEX(:visitor), CURDATE())'
+        );
+        $statement->execute(['article_id' => $articleId, 'visitor' => $visitor]);
+
+        return $statement->rowCount() === 1;
+    }
+
     public function incrementViews(int $id): void
     {
         // The increment happens inside MySQL, so simultaneous views are not lost

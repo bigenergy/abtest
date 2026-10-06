@@ -30,6 +30,16 @@ final class ArticleRepositoryTest extends DatabaseTestCase
         self::assertNull($this->articles->findBySlug('net-takoy'));
     }
 
+    public function testRegistersVisitorViewOncePerDay(): void
+    {
+        $id = $this->createArticle('Статья', [$this->createCategory('PHP')]);
+        $visitor = hash('sha256', 'first visitor');
+
+        self::assertTrue($this->articles->registerView($id, $visitor));
+        self::assertFalse($this->articles->registerView($id, $visitor));
+        self::assertTrue($this->articles->registerView($id, hash('sha256', 'second visitor')));
+    }
+
     public function testIncrementsViews(): void
     {
         $id = $this->createArticle('Статья', [$this->createCategory('PHP')], views: 10);

@@ -49,6 +49,7 @@ final class Seeder
     {
         // MySQL does not allow TRUNCATE of a table referenced by a foreign key while the checks are on
         $this->pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+        $this->pdo->exec('TRUNCATE TABLE article_views');
         $this->pdo->exec('TRUNCATE TABLE article_category');
         $this->pdo->exec('TRUNCATE TABLE articles');
         $this->pdo->exec('TRUNCATE TABLE categories');

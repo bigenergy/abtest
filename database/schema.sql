@@ -43,3 +43,17 @@ CREATE TABLE IF NOT EXISTS article_category
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+-- Who has already seen an article today, so reloads and scripts do not inflate the views counter.
+-- The visitor is a SHA-256 hash of the IP address and the browser, not the address itself.
+CREATE TABLE IF NOT EXISTS article_views
+(
+    article_id INT UNSIGNED NOT NULL,
+    visitor    BINARY(32)   NOT NULL,
+    viewed_on  DATE         NOT NULL,
+    PRIMARY KEY (article_id, visitor, viewed_on),
+    CONSTRAINT fk_article_views_article
+        FOREIGN KEY (article_id) REFERENCES articles (id) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
