@@ -33,4 +33,15 @@
             {/foreach}
         </div>
     </article>
+
+    {if $similar}
+        <section class="similar">
+            <h2 class="similar__title">Похожие статьи</h2>
+            <div class="cards">
+                {foreach $similar as $item}
+                    {include file='partials/article-card.tpl' article=$item}
+                {/foreach}
+            </div>
+        </section>
+    {/if}
 {/block}

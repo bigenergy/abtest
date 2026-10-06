@@ -101,4 +101,30 @@ final class ArticleRepository
 
         return $statement->fetchAll();
     }
+
+    /**
+     * Articles that share the most categories with the given one; fresher ones go first among equals.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findSimilar(int $articleId, int $limit): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT a.id, a.title, a.description, a.image, a.views, a.published_at
+             FROM article_category ac
+             JOIN article_category related
+                  ON related.category_id = ac.category_id
+                 AND related.article_id <> ac.article_id
+             JOIN articles a ON a.id = related.article_id
+             WHERE ac.article_id = :article_id
+             GROUP BY a.id
+             ORDER BY COUNT(*) DESC, a.published_at DESC, a.id DESC
+             LIMIT :limit'
+        );
+        $statement->bindValue('article_id', $articleId, PDO::PARAM_INT);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
 }

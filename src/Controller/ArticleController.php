@@ -11,6 +11,8 @@ use App\Repository\CategoryRepository;
 
 final class ArticleController
 {
+    private const SIMILAR_ARTICLES = 3;
+
     public function __construct(
         private readonly CategoryRepository $categories,
         private readonly ArticleRepository $articles,
@@ -26,6 +28,7 @@ final class ArticleController
         return $this->view->render('article.tpl', [
             'article' => $article,
             'categories' => $this->categories->findByArticle($id),
+            'similar' => $this->articles->findSimilar($id, self::SIMILAR_ARTICLES),
         ]);
     }
 }
