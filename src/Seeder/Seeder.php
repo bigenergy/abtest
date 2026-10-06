@@ -104,7 +104,9 @@ final class Seeder
             ]);
             $articleId = (int) $this->pdo->lastInsertId();
 
-            $extraCategoryIds = $this->randomItems(array_diff($categoryIds, [$mainCategoryId]), random_int(0, 2));
+            // Most articles stay in one category, about a third get one or two more
+            $extraCount = random_int(1, 10) <= 7 ? 0 : random_int(1, 2);
+            $extraCategoryIds = $this->randomItems(array_diff($categoryIds, [$mainCategoryId]), $extraCount);
             foreach ([$mainCategoryId, ...$extraCategoryIds] as $categoryId) {
                 $attachCategory->execute(['article_id' => $articleId, 'category_id' => $categoryId]);
             }
