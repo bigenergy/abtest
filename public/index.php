@@ -21,9 +21,9 @@ $config = require $root . '/config/config.php';
 $view = new View($root . '/templates', $root . '/var/templates_c', $root . '/var/cache');
 
 try {
-    $pdo = Database::connect($config['db']);
-    $categories = new CategoryRepository($pdo);
-    $articles = new ArticleRepository($pdo);
+    $db = new Database($config['db']);
+    $categories = new CategoryRepository($db);
+    $articles = new ArticleRepository($db);
     $viewCounter = new ViewCounter($articles);
 
     $router = new Router();

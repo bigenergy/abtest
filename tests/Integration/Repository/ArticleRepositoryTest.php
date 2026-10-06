@@ -16,7 +16,7 @@ final class ArticleRepositoryTest extends DatabaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->articles = new ArticleRepository($this->pdo);
+        $this->articles = new ArticleRepository($this->db);
     }
 
     public function testFindsArticleBySlug(): void

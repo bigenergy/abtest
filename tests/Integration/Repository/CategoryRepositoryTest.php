@@ -14,7 +14,7 @@ final class CategoryRepositoryTest extends DatabaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->categories = new CategoryRepository($this->pdo);
+        $this->categories = new CategoryRepository($this->db);
     }
 
     public function testFindsCategoryBySlug(): void

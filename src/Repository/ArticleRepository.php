@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Core\Database;
 use PDO;
 
 final class ArticleRepository
 {
-    public function __construct(private readonly PDO $pdo)
+    public function __construct(private readonly Database $db)
     {
     }
 
@@ -17,7 +18,7 @@ final class ArticleRepository
      */
     public function findBySlug(string $slug): ?array
     {
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             'SELECT id, slug, title, description, content, image, views, published_at
              FROM articles
              WHERE slug = :slug'
@@ -30,7 +31,7 @@ final class ArticleRepository
     public function incrementViews(int $id): void
     {
         // The increment happens inside MySQL, so simultaneous views are not lost
-        $this->pdo->prepare('UPDATE articles SET views = views + 1 WHERE id = :id')->execute(['id' => $id]);
+        $this->db->prepare('UPDATE articles SET views = views + 1 WHERE id = :id')->execute(['id' => $id]);
     }
 
     /**
@@ -42,7 +43,7 @@ final class ArticleRepository
     {
         // ROW_NUMBER() numbers articles inside each category starting from the newest one,
         // so one query returns the top N for all categories at once
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             'SELECT category_id, id, slug, title, description, image, views, published_at
              FROM (
                  SELECT ac.category_id, a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at,
@@ -70,7 +71,7 @@ final class ArticleRepository
     public function countByCategory(int $categoryId): int
     {
         // No join with articles is needed: the foreign key guarantees that every link points to an article
-        $statement = $this->pdo->prepare('SELECT COUNT(*) FROM article_category WHERE category_id = :category_id');
+        $statement = $this->db->prepare('SELECT COUNT(*) FROM article_category WHERE category_id = :category_id');
         $statement->execute(['category_id' => $categoryId]);
 
         return (int) $statement->fetchColumn();
@@ -90,7 +91,7 @@ final class ArticleRepository
             ArticleSort::LeastViewed => 'a.views ASC, a.id ASC',
         };
 
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             "SELECT a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at
              FROM articles a
              JOIN article_category ac ON ac.article_id = a.id
@@ -130,7 +131,7 @@ final class ArticleRepository
      */
     private function findBySharedCategories(int $articleId, int $limit): array
     {
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             'SELECT a.id, a.slug, a.title, a.description, a.image, a.views, a.published_at
              FROM article_category ac
              JOIN article_category related
@@ -158,7 +159,7 @@ final class ArticleRepository
         // One placeholder per excluded id: NOT IN (?, ?, ?)
         $placeholders = implode(', ', array_fill(0, count($excludeIds), '?'));
 
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             "SELECT id, slug, title, description, image, views, published_at
              FROM articles
              WHERE id NOT IN ({$placeholders})

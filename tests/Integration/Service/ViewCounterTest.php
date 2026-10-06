@@ -16,7 +16,7 @@ final class ViewCounterTest extends DatabaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->articles = new ArticleRepository($this->pdo);
+        $this->articles = new ArticleRepository($this->db);
         $this->counter = new ViewCounter($this->articles);
 
         // Every test is a new visitor with a regular browser

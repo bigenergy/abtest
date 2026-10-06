@@ -28,7 +28,8 @@ if ($articleCount === false) {
     exit(1);
 }
 
-$seeder = new Seeder(Database::connect($config['db']), require $root . '/database/seed-data.php');
+$database = new Database($config['db']);
+$seeder = new Seeder($database->pdo(), require $root . '/database/seed-data.php');
 $seeder->run($articleCount);
 
 // The cached home page still lists the old articles

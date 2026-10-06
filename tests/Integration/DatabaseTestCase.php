@@ -17,13 +17,17 @@ use RuntimeException;
  */
 abstract class DatabaseTestCase extends TestCase
 {
-    private static ?PDO $connection = null;
+    private static ?Database $database = null;
 
+    protected Database $db;
+
+    /** The same connection, for preparing test data */
     protected PDO $pdo;
 
     protected function setUp(): void
     {
-        $this->pdo = self::connection();
+        $this->db = self::database();
+        $this->pdo = $this->db->pdo();
 
         $this->pdo->exec('DELETE FROM article_category');
         $this->pdo->exec('DELETE FROM articles');
@@ -71,10 +75,10 @@ abstract class DatabaseTestCase extends TestCase
         return $articleId;
     }
 
-    private static function connection(): PDO
+    private static function database(): Database
     {
-        if (self::$connection !== null) {
-            return self::$connection;
+        if (self::$database !== null) {
+            return self::$database;
         }
 
         $root = dirname(__DIR__, 2);
@@ -85,14 +89,14 @@ abstract class DatabaseTestCase extends TestCase
             throw new RuntimeException("Integration tests need a database named *_test, got \"{$config['name']}\"");
         }
 
-        $pdo = Database::connect($config);
-        $pdo->exec('DROP TABLE IF EXISTS article_category, articles, categories');
+        $database = new Database($config);
+        $database->pdo()->exec('DROP TABLE IF EXISTS article_category, articles, categories');
 
         $schema = file_get_contents($root . '/database/schema.sql');
         foreach (array_filter(array_map('trim', explode(';', $schema))) as $statement) {
-            $pdo->exec($statement);
+            $database->pdo()->exec($statement);
         }
 
-        return self::$connection = $pdo;
+        return self::$database = $database;
     }
 }

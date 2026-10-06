@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use PDO;
+use App\Core\Database;
 
 final class CategoryRepository
 {
-    public function __construct(private readonly PDO $pdo)
+    public function __construct(private readonly Database $db)
     {
     }
 
@@ -17,7 +17,7 @@ final class CategoryRepository
      */
     public function findBySlug(string $slug): ?array
     {
-        $statement = $this->pdo->prepare('SELECT id, slug, name, description FROM categories WHERE slug = :slug');
+        $statement = $this->db->prepare('SELECT id, slug, name, description FROM categories WHERE slug = :slug');
         $statement->execute(['slug' => $slug]);
 
         return $statement->fetch() ?: null;
@@ -28,7 +28,7 @@ final class CategoryRepository
      */
     public function findByArticle(int $articleId): array
     {
-        $statement = $this->pdo->prepare(
+        $statement = $this->db->prepare(
             'SELECT c.id, c.slug, c.name
              FROM categories c
              JOIN article_category ac ON ac.category_id = c.id
@@ -47,7 +47,7 @@ final class CategoryRepository
      */
     public function findNotEmpty(): array
     {
-        return $this->pdo->query(
+        return $this->db->query(
             'SELECT c.id, c.slug, c.name, c.description
              FROM categories c
              WHERE EXISTS (SELECT 1 FROM article_category ac WHERE ac.category_id = c.id)
