@@ -46,10 +46,19 @@ final class ArticleRepository
         return $grouped;
     }
 
+    public function countByCategory(int $categoryId): int
+    {
+        // No join with articles is needed: the foreign key guarantees that every link points to an article
+        $statement = $this->pdo->prepare('SELECT COUNT(*) FROM article_category WHERE category_id = :category_id');
+        $statement->execute(['category_id' => $categoryId]);
+
+        return (int) $statement->fetchColumn();
+    }
+
     /**
      * @return list<array<string, mixed>>
      */
-    public function findByCategory(int $categoryId, ArticleSort $sort): array
+    public function findByCategory(int $categoryId, ArticleSort $sort, int $limit, int $offset): array
     {
         // ORDER BY cannot be passed as a query parameter, so it comes from a fixed list.
         // The id makes the order stable for articles with equal dates or views.
@@ -63,9 +72,13 @@ final class ArticleRepository
              FROM articles a
              JOIN article_category ac ON ac.article_id = a.id
              WHERE ac.category_id = :category_id
-             ORDER BY {$orderBy}"
+             ORDER BY {$orderBy}
+             LIMIT :limit OFFSET :offset"
         );
-        $statement->execute(['category_id' => $categoryId]);
+        $statement->bindValue('category_id', $categoryId, PDO::PARAM_INT);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue('offset', $offset, PDO::PARAM_INT);
+        $statement->execute();
 
         return $statement->fetchAll();
     }

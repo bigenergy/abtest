@@ -15,6 +15,7 @@
 
     {if $articles}
         <div class="toolbar">
+            <span class="toolbar__count">Статей: {$paginator->total}</span>
             <nav class="sort" aria-label="Сортировка">
                 <span class="sort__label">Сортировать:</span>
                 {foreach $sorts as $option}
@@ -29,6 +30,8 @@
                 {include file='partials/article-card.tpl'}
             {/foreach}
         </div>
+
+        {include file='partials/pagination.tpl'}
     {else}
         <p class="empty">В этой категории пока нет статей.</p>
     {/if}
