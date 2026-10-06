@@ -8,6 +8,7 @@ use App\Core\NotFoundException;
 use App\Core\View;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Service\ViewCounter;
 
 final class ArticleController
 {
@@ -16,6 +17,7 @@ final class ArticleController
     public function __construct(
         private readonly CategoryRepository $categories,
         private readonly ArticleRepository $articles,
+        private readonly ViewCounter $viewCounter,
         private readonly View $view,
     ) {
     }
@@ -23,7 +25,7 @@ final class ArticleController
     public function show(string $slug): string
     {
         $article = $this->articles->findBySlug($slug) ?? throw new NotFoundException();
-        $this->articles->incrementViews($article['id']);
+        $this->viewCounter->count($article['id']);
 
         return $this->view->render('article.tpl', [
             'article' => $article,

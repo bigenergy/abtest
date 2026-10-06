@@ -11,6 +11,7 @@ use App\Core\Router;
 use App\Core\View;
 use App\Repository\ArticleRepository;
 use App\Repository\CategoryRepository;
+use App\Service\ViewCounter;
 
 $root = dirname(__DIR__);
 
@@ -23,11 +24,12 @@ try {
     $pdo = Database::connect($config['db']);
     $categories = new CategoryRepository($pdo);
     $articles = new ArticleRepository($pdo);
+    $viewCounter = new ViewCounter($articles);
 
     $router = new Router();
     $router->add('/', [new HomeController($categories, $articles, $view), 'index']);
     $router->add('/category/{slug}', [new CategoryController($categories, $articles, $view), 'show']);
-    $router->add('/article/{slug}', [new ArticleController($categories, $articles, $view), 'show']);
+    $router->add('/article/{slug}', [new ArticleController($categories, $articles, $viewCounter, $view), 'show']);
 
     echo $router->dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 } catch (NotFoundException) {
