@@ -19,8 +19,15 @@
             <nav class="sort" aria-label="Сортировка">
                 <span class="sort__label">Сортировать:</span>
                 {foreach $sorts as $option}
-                    <a class="sort__link{if $option === $sort} sort__link--active{/if}"
-                       href="?sort={$option->value}"{if $option === $sort} aria-current="true"{/if}>{$option->label()}</a>
+                    {if $option === $sort}
+                        {* A click on the current sorting reverses its direction *}
+                        <a class="sort__link sort__link--active sort__link--{$direction->value}"
+                           href="?sort={$option->value}&amp;direction={$direction->opposite()->value}"
+                           title="Сейчас {$direction->label()}, нажмите, чтобы изменить"
+                           aria-current="true">{$option->label()}</a>
+                    {else}
+                        <a class="sort__link" href="?sort={$option->value}">{$option->label()}</a>
+                    {/if}
                 {/foreach}
             </nav>
         </div>

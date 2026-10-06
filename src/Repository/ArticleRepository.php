@@ -77,13 +77,22 @@ final class ArticleRepository
     /**
      * @return list<array<string, mixed>>
      */
-    public function findByCategory(int $categoryId, ArticleSort $sort, int $limit, int $offset): array
-    {
-        // ORDER BY cannot be passed as a query parameter, so it comes from a fixed list.
-        // The id makes the order stable for articles with equal dates or views.
-        $orderBy = match ($sort) {
-            ArticleSort::Newest => 'a.published_at DESC, a.id DESC',
-            ArticleSort::Popular => 'a.views DESC, a.id DESC',
+    public function findByCategory(
+        int $categoryId,
+        ArticleSort $sort,
+        SortDirection $direction,
+        int $limit,
+        int $offset,
+    ): array {
+        // ORDER BY cannot be passed as a query parameter, so the column and the direction
+        // are taken from fixed lists. The id makes the order stable for equal dates or views.
+        $column = match ($sort) {
+            ArticleSort::Date => 'a.published_at',
+            ArticleSort::Views => 'a.views',
+        };
+        $order = match ($direction) {
+            SortDirection::Desc => 'DESC',
+            SortDirection::Asc => 'ASC',
         };
 
         $statement = $this->pdo->prepare(
@@ -91,7 +100,7 @@ final class ArticleRepository
              FROM articles a
              JOIN article_category ac ON ac.article_id = a.id
              WHERE ac.category_id = :category_id
-             ORDER BY {$orderBy}
+             ORDER BY {$column} {$order}, a.id {$order}
              LIMIT :limit OFFSET :offset"
         );
         $statement->bindValue('category_id', $categoryId, PDO::PARAM_INT);

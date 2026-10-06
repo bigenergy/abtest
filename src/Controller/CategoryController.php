@@ -10,6 +10,7 @@ use App\Core\View;
 use App\Repository\ArticleRepository;
 use App\Repository\ArticleSort;
 use App\Repository\CategoryRepository;
+use App\Repository\SortDirection;
 
 final class CategoryController
 {
@@ -26,6 +27,7 @@ final class CategoryController
     {
         $category = $this->categories->find($id) ?? throw new NotFoundException();
         $sort = ArticleSort::fromQuery($_GET['sort'] ?? null);
+        $direction = SortDirection::fromQuery($_GET['direction'] ?? null);
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
             ?: throw new NotFoundException();
 
@@ -33,17 +35,26 @@ final class CategoryController
             total: $this->articles->countByCategory($id),
             perPage: self::ARTICLES_PER_PAGE,
             page: $page,
-            query: ['sort' => $sort->value],
+            query: ['sort' => $sort->value, 'direction' => $direction->value],
         );
 
         if ($page > $paginator->lastPage) {
             throw new NotFoundException();
         }
 
+        $articles = $this->articles->findByCategory(
+            $id,
+            $sort,
+            $direction,
+            self::ARTICLES_PER_PAGE,
+            $paginator->offset(),
+        );
+
         return $this->view->render('category.tpl', [
             'category' => $category,
-            'articles' => $this->articles->findByCategory($id, $sort, self::ARTICLES_PER_PAGE, $paginator->offset()),
+            'articles' => $articles,
             'sort' => $sort,
+            'direction' => $direction,
             'sorts' => ArticleSort::cases(),
             'paginator' => $paginator,
         ]);
