@@ -17,7 +17,22 @@ final class Paginator
         public readonly int $page,
         private readonly array $query = [],
     ) {
-        $this->lastPage = max(1, (int) ceil($total / $perPage));
+        $this->lastPage = self::countPages($total, $perPage);
+    }
+
+    /**
+     * Takes the page number as it came in the query string.
+     * Returns null if it is not a number or there is no such page.
+     *
+     * @param array<string, string> $query
+     */
+    public static function fromQuery(int $total, int $perPage, mixed $page, array $query = []): ?self
+    {
+        $page = filter_var($page ?? 1, FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1, 'max_range' => self::countPages($total, $perPage)],
+        ]);
+
+        return $page === false ? null : new self($total, $perPage, $page, $query);
     }
 
     public function offset(): int
@@ -58,5 +73,11 @@ final class Paginator
         }
 
         return $links;
+    }
+
+    private static function countPages(int $total, int $perPage): int
+    {
+        // An empty list still has one (empty) page
+        return max(1, (int) ceil($total / $perPage));
     }
 }

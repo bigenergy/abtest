@@ -26,23 +26,17 @@ final class CategoryController
     {
         $category = $this->categories->find($id) ?? throw new NotFoundException();
         $sort = ArticleSort::fromQuery($_GET['sort'] ?? null);
-        $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])
-            ?: throw new NotFoundException();
 
-        $paginator = new Paginator(
+        $paginator = Paginator::fromQuery(
             total: $this->articles->countByCategory($id),
             perPage: self::ARTICLES_PER_PAGE,
-            page: $page,
+            page: $_GET['page'] ?? null,
             query: ['sort' => $sort->value],
-        );
-
-        if ($page > $paginator->lastPage) {
-            throw new NotFoundException();
-        }
+        ) ?? throw new NotFoundException();
 
         return $this->view->render('category.tpl', [
             'category' => $category,
-            'articles' => $this->articles->findByCategory($id, $sort, self::ARTICLES_PER_PAGE, $paginator->offset()),
+            'articles' => $this->articles->findByCategory($id, $sort, $paginator->perPage, $paginator->offset()),
             'sort' => $sort,
             'sorts' => ArticleSort::cases(),
             'paginator' => $paginator,
