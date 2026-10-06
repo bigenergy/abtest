@@ -45,4 +45,28 @@ final class ArticleRepository
 
         return $grouped;
     }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function findByCategory(int $categoryId, ArticleSort $sort): array
+    {
+        // ORDER BY cannot be passed as a query parameter, so it comes from a fixed list.
+        // The id makes the order stable for articles with equal dates or views.
+        $orderBy = match ($sort) {
+            ArticleSort::Newest => 'a.published_at DESC, a.id DESC',
+            ArticleSort::Popular => 'a.views DESC, a.id DESC',
+        };
+
+        $statement = $this->pdo->prepare(
+            "SELECT a.id, a.title, a.description, a.image, a.views, a.published_at
+             FROM articles a
+             JOIN article_category ac ON ac.article_id = a.id
+             WHERE ac.category_id = :category_id
+             ORDER BY {$orderBy}"
+        );
+        $statement->execute(['category_id' => $categoryId]);
+
+        return $statement->fetchAll();
+    }
 }

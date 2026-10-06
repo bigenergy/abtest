@@ -13,6 +13,17 @@ final class CategoryRepository
     }
 
     /**
+     * @return array{id: int, name: string, description: string}|null
+     */
+    public function find(int $id): ?array
+    {
+        $statement = $this->pdo->prepare('SELECT id, name, description FROM categories WHERE id = :id');
+        $statement->execute(['id' => $id]);
+
+        return $statement->fetch() ?: null;
+    }
+
+    /**
      * Categories that have at least one article.
      *
      * @return list<array{id: int, name: string, description: string}>

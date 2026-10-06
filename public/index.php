@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controller\CategoryController;
 use App\Controller\HomeController;
 use App\Core\Database;
 use App\Core\NotFoundException;
@@ -24,6 +25,7 @@ try {
 
     $router = new Router();
     $router->add('/', [new HomeController($categories, $articles, $view), 'index']);
+    $router->add('/category/{id}', [new CategoryController($categories, $articles, $view), 'show']);
 
     echo $router->dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 } catch (NotFoundException) {
