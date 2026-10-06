@@ -24,6 +24,7 @@ final class View
         // Every {$variable} is escaped, so data from the database is safe to print as is
         $this->smarty->setEscapeHtml(true);
         $this->smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'date_ru', self::formatDate(...));
+        $this->smarty->registerPlugin(Smarty::PLUGIN_MODIFIER, 'paragraphs', self::splitParagraphs(...));
     }
 
     /**
@@ -45,5 +46,15 @@ final class View
         $date = new DateTimeImmutable($date);
 
         return sprintf('%d %s %d', $date->format('j'), self::MONTHS[(int) $date->format('n')], $date->format('Y'));
+    }
+
+    /**
+     * Plain text is stored with paragraphs separated by an empty line.
+     *
+     * @return list<string>
+     */
+    private static function splitParagraphs(string $text): array
+    {
+        return preg_split('/\R\s*\R/', trim($text));
     }
 }

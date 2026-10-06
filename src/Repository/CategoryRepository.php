@@ -24,6 +24,23 @@ final class CategoryRepository
     }
 
     /**
+     * @return list<array{id: int, name: string}>
+     */
+    public function findByArticle(int $articleId): array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT c.id, c.name
+             FROM categories c
+             JOIN article_category ac ON ac.category_id = c.id
+             WHERE ac.article_id = :article_id
+             ORDER BY c.name'
+        );
+        $statement->execute(['article_id' => $articleId]);
+
+        return $statement->fetchAll();
+    }
+
+    /**
      * Categories that have at least one article.
      *
      * @return list<array{id: int, name: string, description: string}>

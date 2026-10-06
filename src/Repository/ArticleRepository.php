@@ -13,6 +13,25 @@ final class ArticleRepository
     }
 
     /**
+     * @return array<string, mixed>|null
+     */
+    public function find(int $id): ?array
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT id, title, description, content, image, views, published_at FROM articles WHERE id = :id'
+        );
+        $statement->execute(['id' => $id]);
+
+        return $statement->fetch() ?: null;
+    }
+
+    public function incrementViews(int $id): void
+    {
+        // The increment happens inside MySQL, so simultaneous views are not lost
+        $this->pdo->prepare('UPDATE articles SET views = views + 1 WHERE id = :id')->execute(['id' => $id]);
+    }
+
+    /**
      * The latest articles of every category, grouped by category id.
      *
      * @return array<int, list<array<string, mixed>>>
