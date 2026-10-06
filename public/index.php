@@ -2,20 +2,29 @@
 
 declare(strict_types=1);
 
+use App\Controller\HomeController;
+use App\Core\Database;
 use App\Core\NotFoundException;
 use App\Core\Router;
 use App\Core\View;
+use App\Repository\ArticleRepository;
+use App\Repository\CategoryRepository;
 
 $root = dirname(__DIR__);
 
 require $root . '/vendor/autoload.php';
 
+$config = require $root . '/config/config.php';
 $view = new View($root . '/templates', $root . '/var/templates_c');
 
-$router = new Router();
-$router->add('/', static fn (): string => $view->render('home.tpl'));
-
 try {
+    $pdo = Database::connect($config['db']);
+    $categories = new CategoryRepository($pdo);
+    $articles = new ArticleRepository($pdo);
+
+    $router = new Router();
+    $router->add('/', [new HomeController($categories, $articles, $view), 'index']);
+
     echo $router->dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/');
 } catch (NotFoundException) {
     http_response_code(404);
