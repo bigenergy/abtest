@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Seeder;
 
+use App\Core\Slug;
 use PDO;
 use RuntimeException;
 use Throwable;
@@ -59,11 +60,17 @@ final class Seeder
      */
     private function seedCategories(): array
     {
-        $insert = $this->pdo->prepare('INSERT INTO categories (name, description) VALUES (:name, :description)');
+        $insert = $this->pdo->prepare(
+            'INSERT INTO categories (slug, name, description) VALUES (:slug, :name, :description)'
+        );
 
         $topics = [];
         foreach ($this->data['categories'] as $category) {
-            $insert->execute(['name' => $category['name'], 'description' => $category['description']]);
+            $insert->execute([
+                'slug' => Slug::fromText($category['name']),
+                'name' => $category['name'],
+                'description' => $category['description'],
+            ]);
             $topics[(int) $this->pdo->lastInsertId()] = $category['topics'];
         }
 
@@ -81,8 +88,8 @@ final class Seeder
         $titles = array_map($this->shuffledTitles(...), $topics);
 
         $insertArticle = $this->pdo->prepare(
-            'INSERT INTO articles (title, description, content, image, views, published_at)
-             VALUES (:title, :description, :content, :image, :views, :published_at)'
+            'INSERT INTO articles (slug, title, description, content, image, views, published_at)
+             VALUES (:slug, :title, :description, :content, :image, :views, :published_at)'
         );
         $attachCategory = $this->pdo->prepare(
             'INSERT INTO article_category (article_id, category_id) VALUES (:article_id, :category_id)'
@@ -95,6 +102,7 @@ final class Seeder
                 ?? throw new RuntimeException('Not enough unique titles: add topics to database/seed-data.php');
 
             $insertArticle->execute([
+                'slug' => Slug::fromText($title),
                 'title' => $title,
                 'description' => sprintf($this->randomItem($this->data['descriptions']), $topic),
                 'content' => $this->makeContent(),

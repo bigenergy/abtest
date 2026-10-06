@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration;
 
 use App\Core\Database;
+use App\Core\Slug;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -32,8 +33,8 @@ abstract class DatabaseTestCase extends TestCase
     protected function createCategory(string $name): int
     {
         $this->pdo
-            ->prepare('INSERT INTO categories (name, description) VALUES (?, ?)')
-            ->execute([$name, "Описание категории {$name}"]);
+            ->prepare('INSERT INTO categories (slug, name, description) VALUES (?, ?, ?)')
+            ->execute([Slug::fromText($name), $name, "Описание категории {$name}"]);
 
         return (int) $this->pdo->lastInsertId();
     }
@@ -49,10 +50,17 @@ abstract class DatabaseTestCase extends TestCase
     ): int {
         $this->pdo
             ->prepare(
-                'INSERT INTO articles (title, description, content, image, views, published_at)
-                 VALUES (?, ?, ?, NULL, ?, ?)'
+                'INSERT INTO articles (slug, title, description, content, image, views, published_at)
+                 VALUES (?, ?, ?, ?, NULL, ?, ?)'
             )
-            ->execute([$title, "Описание статьи {$title}", "Текст статьи {$title}", $views, $publishedAt]);
+            ->execute([
+                Slug::fromText($title),
+                $title,
+                "Описание статьи {$title}",
+                "Текст статьи {$title}",
+                $views,
+                $publishedAt,
+            ]);
         $articleId = (int) $this->pdo->lastInsertId();
 
         $attach = $this->pdo->prepare('INSERT INTO article_category (article_id, category_id) VALUES (?, ?)');
