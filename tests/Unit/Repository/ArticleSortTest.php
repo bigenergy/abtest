@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Repository;
+namespace App\Tests\Unit\Repository;
 
 use App\Repository\ArticleSort;
 use PHPUnit\Framework\Attributes\DataProvider;

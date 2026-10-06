@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Core;
+namespace App\Tests\Unit\Core;
 
 use App\Core\NotFoundException;
 use App\Core\Router;

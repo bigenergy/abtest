@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Core;
+namespace App\Tests\Unit\Core;
 
 use App\Core\View;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ final class ViewTest extends TestCase
 
     protected function setUp(): void
     {
-        $root = dirname(__DIR__, 2);
+        $root = dirname(__DIR__, 3);
         $this->view = new View($root . '/templates', $root . '/var/test/templates_c');
     }
 
